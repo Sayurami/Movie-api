@@ -4,22 +4,30 @@ const crypto = require('crypto');
 const app = express();
 app.use(express.json());
 
-// API keys temporarily memory එකේ තියාගන්න set එකක්
 const apiKeys = new Set();
 
-// Random API key generate කරන function
 function generateApiKey() {
-  return crypto.randomBytes(16).toString('hex');  // 32 char hex string
+  return crypto.randomBytes(16).toString('hex');
 }
 
-// API key generate කරලා දෙන්න POST endpoint එක
+function printKeyBox(key) {
+  const line = '+----------------------------------------------+';
+  const content = `|   Your new API key is: ${key}   |`;
+
+  console.log('\n' + line);
+  console.log(content);
+  console.log(line + '\n');
+}
+
 app.post('/generate-key', (req, res) => {
   const newKey = generateApiKey();
   apiKeys.add(newKey);
+
+  printKeyBox(newKey); // Display API key in box format
+
   res.json({ apiKey: newKey });
 });
 
-// Secure data access කරන GET endpoint එක
 app.get('/secure-data', (req, res) => {
   const key = req.headers['x-api-key'];
   if (!key || !apiKeys.has(key)) {
@@ -28,7 +36,7 @@ app.get('/secure-data', (req, res) => {
   res.send('Secret Data only for authorized API key users!');
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`GOJO-MD Movie API running at http://localhost:${PORT}`);
 });
