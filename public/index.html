@@ -1,5 +1,19 @@
-mkdir public
-echo "<!DOCTYPE html><html><head><title>Movie API</title></head><body><h1>Welcome</h1></body></html>" > public/index.html
-git add public/index.html
-git commit -m "Add missing public/index.html"
-git push
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Movie API</title>
+</head>
+<body>
+  <h1>Welcome to the Movie API</h1>
+  <button onclick="generateKey()">Generate API Key</button>
+  <p id="result"></p>
+
+  <script>
+    async function generateKey() {
+      const response = await fetch('/generate-key', { method: 'POST' });
+      const data = await response.json();
+      document.getElementById('result').innerText = "Your API Key: " + data.apiKey;
+    }
+  </script>
+</body>
+</html>
