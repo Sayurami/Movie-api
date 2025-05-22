@@ -20,7 +20,7 @@
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
-      padding-top: 40px;
+      padding-top: 60px;
     }
 
     .home-icon {
@@ -40,18 +40,18 @@
     h1 {
       font-size: 2.2rem;
       color: #fff;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       text-shadow: 1px 1px 4px #000;
     }
 
     .container {
       background-color: rgba(255, 255, 255, 0.95);
-      padding: 40px 30px;
+      padding: 30px 25px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       text-align: center;
       width: 90%;
-      max-width: 700px;
+      max-width: 800px;
     }
 
     button {
@@ -80,67 +80,61 @@
       background-color: #218838;
     }
 
-    #moviesContainer {
-      margin-top: 30px;
-      text-align: left;
-      max-height: 400px;
-      overflow-y: auto;
+    #searchInput {
+      padding: 10px;
+      width: 100%;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
 
     .movie {
-      background: #f1f1f1;
-      margin-bottom: 15px;
-      padding: 10px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      text-align: left;
     }
 
     .movie img {
-      width: 80px;
-      height: auto;
-      border-radius: 6px;
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    .movie-details {
-      flex: 1;
+    .movie h3 {
+      margin: 10px 0 5px;
     }
 
-    .movie-details h3 {
-      margin: 0;
-      font-size: 1.1rem;
-    }
-
-    .movie-details p {
-      font-size: 0.9rem;
-      color: #555;
-    }
-
-    #result {
-      margin-top: 15px;
-      font-weight: bold;
-      color: #333;
+    .movie a {
+      display: inline-block;
+      margin-top: 8px;
+      background: #28a745;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
 
+  <!-- Home Icon -->
   <a href="/" class="home-icon" title="Home">
     <i class="fas fa-home"></i>
   </a>
 
+  <!-- Main UI Container -->
   <div class="container">
     <h1>Welcome to the Movie API</h1>
 
     <button onclick="generateKey()">Generate API Key</button>
     <button id="copyBtn" onclick="copyKey()">Copy Key</button>
-    <button id="loadBtn" onclick="loadMovies()" style="display: none;">Load Movies</button>
 
     <p id="result"></p>
 
-    <div id="moviesContainer"></div>
+    <input type="text" id="searchInput" placeholder="Search movies...">
+    <button onclick="loadMovies()">Load Movies</button>
+
+    <div id="moviesArea" style="margin-top: 20px;"></div>
   </div>
 
   <script>
@@ -153,7 +147,6 @@
         currentKey = data.apiKey;
         document.getElementById('result').innerText = "Your API Key: " + currentKey;
         document.getElementById('copyBtn').style.display = 'inline-block';
-        document.getElementById('loadBtn').style.display = 'inline-block';
       } catch (error) {
         document.getElementById('result').innerText = "Error generating key.";
         console.error(error);
@@ -170,41 +163,33 @@
     }
 
     async function loadMovies() {
+      const search = document.getElementById('searchInput').value;
+      const container = document.getElementById('moviesArea');
+      container.innerHTML = 'Loading...';
+
       try {
-        const res = await fetch('/movies', {
+        const response = await fetch(`/movies?search=${encodeURIComponent(search)}`, {
           headers: { 'x-api-key': currentKey }
         });
-        const data = await res.json();
+        const data = await response.json();
 
-        const container = document.getElementById('moviesContainer');
-        container.innerHTML = '';
+        if (!Array.isArray(data)) throw new Error("Invalid data");
 
-        if (data.length === 0) {
-          container.innerHTML = '<p>No movies found.</p>';
-          return;
-        }
-
-        data.forEach(movie => {
-          const movieDiv = document.createElement('div');
-          movieDiv.classList.add('movie');
-
-          movieDiv.innerHTML = `
+        container.innerHTML = data.map(movie => `
+          <div class="movie">
             <img src="${movie.image}" alt="${movie.title}">
-            <div class="movie-details">
-              <h3>${movie.title}</h3>
-              <p>Quality: ${movie.quality}</p>
-              <a href="${movie.link}" target="_blank">Watch Now</a>
-            </div>
-          `;
-
-          container.appendChild(movieDiv);
-        });
+            <h3>${movie.title}</h3>
+            <p>Quality: ${movie.quality}</p>
+            <a href="${movie.link}" target="_blank">Watch / Download</a>
+          </div>
+        `).join('');
 
       } catch (err) {
-        document.getElementById('moviesContainer').innerHTML = '<p>Error loading movies.</p>';
+        container.innerHTML = 'Error loading movies.';
         console.error(err);
       }
     }
   </script>
+
 </body>
 </html>
