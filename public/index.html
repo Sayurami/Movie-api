@@ -1,24 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Movie API</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .home-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 26px;
+      color: #333;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .home-icon:hover {
+      color: #007bff;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: #222;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 6px;
+      margin: 10px 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+      word-break: break-all;
+    }
+
+    #copyBtn {
+      display: none;
+      background-color: #28a745;
+    }
+
+    #copyBtn:hover {
+      background-color: #218838;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to the Movie API</h1>
-  <button onclick="generateKey()">Generate API Key</button>
-  <p id="result"></p>
+
+  <!-- Home Icon -->
+  <a href="/" class="home-icon" title="Home">
+    <i class="fas fa-home"></i>
+  </a>
+
+  <!-- Main UI Container -->
+  <div class="container">
+    <h1>Welcome to the Movie API</h1>
+
+    <button onclick="generateKey()">Generate API Key</button>
+    <button id="copyBtn" onclick="copyKey()">Copy Key</button>
+
+    <p id="result"></p>
+  </div>
 
   <script>
+    let currentKey = '';
+
     async function generateKey() {
       try {
         const response = await fetch('/generate-key', { method: 'POST' });
         const data = await response.json();
-        document.getElementById('result').innerText = "Your API Key: " + data.apiKey;
+        currentKey = data.apiKey;
+        document.getElementById('result').innerText = "Your API Key: " + currentKey;
+        document.getElementById('copyBtn').style.display = 'inline-block';
       } catch (error) {
         document.getElementById('result').innerText = "Error generating key.";
         console.error(error);
       }
     }
+
+    function copyKey() {
+      navigator.clipboard.writeText(currentKey).then(() => {
+        alert("API Key copied to clipboard!");
+      }).catch(err => {
+        alert("Failed to copy key.");
+        console.error(err);
+      });
+    }
   </script>
+
 </body>
 </html>
