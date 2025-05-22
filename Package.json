@@ -1,0 +1,27 @@
+{
+  "name": "movie-api",
+  "version": "1.0.0",
+  "description": "A simple movie API with Sinhala subtitles",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "pm2": "pm2 start server.js --name movie-api"
+  },
+  "keywords": [
+    "movies",
+    "api",
+    "sinhala",
+    "subtitles",
+    "streaming"
+  ],
+  "author": "YourName",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "pm2": "^5.3.0"
+  }
+}
