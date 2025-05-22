@@ -24,6 +24,8 @@
     "nodemon": "^3.1.0",
     "axios": "^1.9.0",
     "cheerio": "^1.0.0",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
     "pm2": "^5.3.0"
   }
 }
