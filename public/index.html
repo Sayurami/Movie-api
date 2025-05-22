@@ -18,8 +18,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
+      padding-top: 40px;
     }
 
     .home-icon {
@@ -44,13 +45,13 @@
     }
 
     .container {
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255, 255, 255, 0.95);
       padding: 40px 30px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       text-align: center;
       width: 90%;
-      max-width: 400px;
+      max-width: 700px;
     }
 
     button {
@@ -70,13 +71,6 @@
       background-color: #0056b3;
     }
 
-    #result {
-      margin-top: 20px;
-      font-weight: bold;
-      color: #333;
-      word-break: break-word;
-    }
-
     #copyBtn {
       display: none;
       background-color: #28a745;
@@ -85,23 +79,68 @@
     #copyBtn:hover {
       background-color: #218838;
     }
+
+    #moviesContainer {
+      margin-top: 30px;
+      text-align: left;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .movie {
+      background: #f1f1f1;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .movie img {
+      width: 80px;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    .movie-details {
+      flex: 1;
+    }
+
+    .movie-details h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .movie-details p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #333;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Home Icon -->
   <a href="/" class="home-icon" title="Home">
     <i class="fas fa-home"></i>
   </a>
 
-  <!-- Main UI Container -->
   <div class="container">
     <h1>Welcome to the Movie API</h1>
 
     <button onclick="generateKey()">Generate API Key</button>
     <button id="copyBtn" onclick="copyKey()">Copy Key</button>
+    <button id="loadBtn" onclick="loadMovies()" style="display: none;">Load Movies</button>
 
     <p id="result"></p>
+
+    <div id="moviesContainer"></div>
   </div>
 
   <script>
@@ -114,6 +153,7 @@
         currentKey = data.apiKey;
         document.getElementById('result').innerText = "Your API Key: " + currentKey;
         document.getElementById('copyBtn').style.display = 'inline-block';
+        document.getElementById('loadBtn').style.display = 'inline-block';
       } catch (error) {
         document.getElementById('result').innerText = "Error generating key.";
         console.error(error);
@@ -128,7 +168,43 @@
         console.error(err);
       });
     }
-  </script>
 
+    async function loadMovies() {
+      try {
+        const res = await fetch('/movies', {
+          headers: { 'x-api-key': currentKey }
+        });
+        const data = await res.json();
+
+        const container = document.getElementById('moviesContainer');
+        container.innerHTML = '';
+
+        if (data.length === 0) {
+          container.innerHTML = '<p>No movies found.</p>';
+          return;
+        }
+
+        data.forEach(movie => {
+          const movieDiv = document.createElement('div');
+          movieDiv.classList.add('movie');
+
+          movieDiv.innerHTML = `
+            <img src="${movie.image}" alt="${movie.title}">
+            <div class="movie-details">
+              <h3>${movie.title}</h3>
+              <p>Quality: ${movie.quality}</p>
+              <a href="${movie.link}" target="_blank">Watch Now</a>
+            </div>
+          `;
+
+          container.appendChild(movieDiv);
+        });
+
+      } catch (err) {
+        document.getElementById('moviesContainer').innerHTML = '<p>Error loading movies.</p>';
+        console.error(err);
+      }
+    }
+  </script>
 </body>
 </html>
