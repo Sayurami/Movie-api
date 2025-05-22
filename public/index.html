@@ -5,11 +5,7 @@
   <title>Movie API</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -20,7 +16,7 @@
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
-      padding-top: 60px;
+      padding-top: 40px;
     }
 
     .home-icon {
@@ -33,9 +29,7 @@
       transition: color 0.3s ease;
     }
 
-    .home-icon:hover {
-      color: #00f0ff;
-    }
+    .home-icon:hover { color: #00f0ff; }
 
     h1 {
       font-size: 2.2rem;
@@ -46,17 +40,26 @@
 
     .container {
       background-color: rgba(255, 255, 255, 0.95);
-      padding: 30px 25px;
+      padding: 30px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       text-align: center;
       width: 90%;
-      max-width: 800px;
+      max-width: 700px;
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      padding: 10px;
+      margin: 10px 5px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
 
     button {
-      padding: 12px 25px;
-      font-size: 16px;
+      padding: 12px 20px;
+      font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       border: none;
@@ -67,74 +70,100 @@
       transition: background-color 0.3s ease;
     }
 
-    button:hover {
-      background-color: #0056b3;
-    }
+    button:hover { background-color: #0056b3; }
 
     #copyBtn {
       display: none;
       background-color: #28a745;
     }
 
-    #copyBtn:hover {
-      background-color: #218838;
+    #copyBtn:hover { background-color: #218838; }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+      word-break: break-word;
     }
 
-    #searchInput {
-      padding: 10px;
-      width: 100%;
-      margin-top: 15px;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+    .movies {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
     }
 
     .movie {
-      margin-bottom: 30px;
-      text-align: left;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      text-align: center;
     }
 
     .movie img {
-      max-width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
     }
 
-    .movie h3 {
-      margin: 10px 0 5px;
+    .movie h4 {
+      font-size: 16px;
+      padding: 10px;
     }
 
-    .movie a {
-      display: inline-block;
-      margin-top: 8px;
-      background: #28a745;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 5px;
+    .movie small {
+      color: #555;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .watermark {
+      margin-top: 30px;
+      font-size: 14px;
+      animation: fadein 2s ease-in-out infinite alternate;
+      text-shadow: 1px 1px 3px #000;
+    }
+
+    .watermark a {
+      color: #00f0ff;
       text-decoration: none;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0.6; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Home Icon -->
   <a href="/" class="home-icon" title="Home">
     <i class="fas fa-home"></i>
   </a>
 
-  <!-- Main UI Container -->
-  <div class="container">
-    <h1>Welcome to the Movie API</h1>
+  <h1>Welcome to the Movie API</h1>
 
+  <div class="container">
     <button onclick="generateKey()">Generate API Key</button>
     <button id="copyBtn" onclick="copyKey()">Copy Key</button>
-
     <p id="result"></p>
 
-    <input type="text" id="searchInput" placeholder="Search movies...">
-    <button onclick="loadMovies()">Load Movies</button>
+    <input type="text" id="search" placeholder="Search by title">
+    <select id="quality">
+      <option value="">All Qualities</option>
+      <option value="HD">HD</option>
+      <option value="SD">SD</option>
+      <option value="720p">720p</option>
+      <option value="1080p">1080p</option>
+    </select>
+    <button onclick="loadMovies()">Get Movies</button>
 
-    <div id="moviesArea" style="margin-top: 20px;"></div>
+    <div class="movies" id="movies"></div>
+  </div>
+
+  <div class="watermark">
+    <a href="https://github.com/Sayurami" target="_blank">Powered by <strong>Sayura</strong></a>
   </div>
 
   <script>
@@ -149,43 +178,44 @@
         document.getElementById('copyBtn').style.display = 'inline-block';
       } catch (error) {
         document.getElementById('result').innerText = "Error generating key.";
-        console.error(error);
       }
     }
 
     function copyKey() {
       navigator.clipboard.writeText(currentKey).then(() => {
         alert("API Key copied to clipboard!");
-      }).catch(err => {
-        alert("Failed to copy key.");
-        console.error(err);
       });
     }
 
     async function loadMovies() {
-      const search = document.getElementById('searchInput').value;
-      const container = document.getElementById('moviesArea');
-      container.innerHTML = 'Loading...';
+      const search = document.getElementById('search').value;
+      const quality = document.getElementById('quality').value;
 
       try {
-        const response = await fetch(`/movies?search=${encodeURIComponent(search)}`, {
+        const response = await fetch(`/movies?search=${search}&quality=${quality}`, {
           headers: { 'x-api-key': currentKey }
         });
-        const data = await response.json();
+        const movies = await response.json();
 
-        if (!Array.isArray(data)) throw new Error("Invalid data");
+        const container = document.getElementById('movies');
+        container.innerHTML = '';
 
-        container.innerHTML = data.map(movie => `
-          <div class="movie">
-            <img src="${movie.image}" alt="${movie.title}">
-            <h3>${movie.title}</h3>
-            <p>Quality: ${movie.quality}</p>
-            <a href="${movie.link}" target="_blank">Watch / Download</a>
-          </div>
-        `).join('');
-
+        if (movies.length === 0) {
+          container.innerHTML = '<p>No movies found.</p>';
+        } else {
+          movies.forEach(movie => {
+            const div = document.createElement('div');
+            div.className = 'movie';
+            div.innerHTML = `
+              <img src="${movie.image}" alt="${movie.title}" />
+              <h4>${movie.title}</h4>
+              <small>${movie.quality}</small>
+            `;
+            container.appendChild(div);
+          });
+        }
       } catch (err) {
-        container.innerHTML = 'Error loading movies.';
+        alert("Failed to fetch movies. Make sure your API key is valid.");
         console.error(err);
       }
     }
