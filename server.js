@@ -6,6 +6,10 @@ const PORT = process.env.PORT || 8000;
 
 const BASE_URL = 'https://cinesubz.co/movies/';
 
+app.get('/', (req, res) => {
+    res.send('Welcome to GOJO-MD Movie API! Use /movies to get movie data.');
+});
+
 app.get('/movies', async (req, res) => {
     try {
         const { search, quality } = req.query;
@@ -44,5 +48,5 @@ app.get('/movies', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`ASITHA-MD Movie API running at http://localhost:${PORT}`);
+    console.log(`GOJO-MD Movie API running at http://localhost:${PORT}`);
 });
