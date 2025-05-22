@@ -10,9 +10,14 @@
 
   <script>
     async function generateKey() {
-      const response = await fetch('/generate-key', { method: 'POST' });
-      const data = await response.json();
-      document.getElementById('result').innerText = "Your API Key: " + data.apiKey;
+      try {
+        const response = await fetch('/generate-key', { method: 'POST' });
+        const data = await response.json();
+        document.getElementById('result').innerText = "Your API Key: " + data.apiKey;
+      } catch (error) {
+        document.getElementById('result').innerText = "Error generating key.";
+        console.error(error);
+      }
     }
   </script>
 </body>
