@@ -2,12 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>API Key Generator</title>
+  <title>API Key Generator + Movie List</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+
+    .icons {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    #movie-list {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin-top: 20px;
+    }
+
+    #movie-list li {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
+  <!-- Icon row -->
+  <div class="icons">
+    <i class="fas fa-home"></i> Home
+    &nbsp;&nbsp;
+    <i class="fas fa-film"></i> Movies
+  </div>
+
   <h2>Generate API Key</h2>
   <button onclick="generateKey()">Generate</button>
   <p><strong>Your API Key:</strong> <span id="keyDisplay">None</span></p>
+
+  <!-- Movie list display -->
+  <div id="movie-list">
+    <h3>Available Movies:</h3>
+    <ul id="listContainer"></ul>
+  </div>
 
   <script>
     async function generateKey() {
@@ -15,6 +53,20 @@
       const data = await response.json();
       document.getElementById('keyDisplay').textContent = data.apiKey;
     }
+
+    // Load movie data from your GitHub raw JSON
+    async function loadMovies() {
+      const res = await fetch('https://raw.githubusercontent.com/Sayurami/Movie-api/main/sinhalasub_data.json');
+      const data = await res.json();
+      const list = document.getElementById('listContainer');
+      data.forEach(movie => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${movie.pageTitle}</strong><br><a href="${movie.url}" target="_blank">${movie.url}</a>`;
+        list.appendChild(li);
+      });
+    }
+
+    loadMovies();
   </script>
 </body>
 </html>
