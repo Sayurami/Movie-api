@@ -1,11 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Movie API</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <title>Movie API Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* (All your existing CSS remains unchanged) */
+    /* Reset & base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 15px 50px;
+      color: #f0f0f0;
+    }
+
+    a.home-icon {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 28px;
+      color: #00f0ff;
+      transition: color 0.3s ease;
+      z-index: 10;
+    }
+
+    a.home-icon:hover {
+      color: #81f7ff;
+    }
+
+    button#logoutBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff4b5c;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 75, 92, 0.6);
+      z-index: 10;
+    }
+
+    button#logoutBtn:hover {
+      background: #e03e4d;
+      box-shadow: 0 6px 20px rgba(224, 62, 77, 0.8);
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 25px;
+      text-shadow: 0 2px 8px rgba(0, 255, 255, 0.7);
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 35px 40px;
+      max-width: 720px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .buttons-group {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      background: #00f0ff;
+      border: none;
+      padding: 14px 26px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #003841;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 240, 255, 0.5);
+      transition: background 0.25s ease, box-shadow 0.25s ease;
+      min-width: 150px;
+      text-align: center;
+    }
+
+    button:hover {
+      background: #00c8e0;
+      box-shadow: 0 7px 20px rgba(0, 200, 224, 0.7);
+    }
+
+    #copyBtn {
+      background: #16c79a;
+      color: white;
+      min-width: 120px;
+      display: none;
+      box-shadow: 0 5px 15px rgba(22, 199, 154, 0.6);
+    }
+
+    #copyBtn:hover {
+      background: #129c7d;
+      box-shadow: 0 7px 20px rgba(18, 156, 125, 0.8);
+    }
+
+    #result {
+      text-align: center;
+      font-weight: 700;
+      margin: 0 0 20px;
+      color: #00f0ff;
+      word-break: break-word;
+      font-size: 1.1rem;
+      min-height: 24px;
+      text-shadow: 0 1px 3px rgba(0, 255, 255, 0.7);
+    }
+
+    .search-filters {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    input#search {
+      padding: 12px 18px;
+      border-radius: 30px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      width: 240px;
+      box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.3);
+      transition: box-shadow 0.3s ease;
+      background: rgba(255, 255, 255, 0.15);
+      color: #e0f7fa;
+    }
+
+    input#search::placeholder {
+      color: #b2ebf2;
+    }
+
+    input#search:focus {
+      box-shadow: inset 0 0 12px rgba(0, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    select#quality {
+      padding: 12px 18px;
+      border-radius: 30px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      width: 160px;
+      box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.15);
+      color: #e0f7fa;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+    }
+
+    select#quality:focus {
+      box-shadow: inset 0 0 12px rgba(0, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .movies {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 5px;
+      scrollbar-width: thin;
+      scrollbar-color: #00f0ff transparent;
+    }
+
+    .movies::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .movies::-webkit-scrollbar-thumb {
+      background-color: #00f0ff;
+      border-radius: 10px;
+    }
+
+    .movie {
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 255, 255, 0.3);
+      text-align: center;
+      color: #e0f7fa;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .movie:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 255, 255, 0.7);
+    }
+
+    .movie img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border-bottom: 2px solid #00f0ff;
+    }
+
+    .movie h4 {
+      padding: 12px 10px 6px;
+      font-weight: 700;
+      font-size: 18px;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .movie small {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 14px;
+      color: #a0e7ff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .watermark {
+      margin-top: 30px;
+      font-size: 15px;
+      color: #00f0ff;
+      font-weight: 600;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+      animation: pulse 3s ease-in-out infinite alternate;
+    }
+
+    .watermark a {
+      color: #00e6ff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .watermark a:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
   </style>
   <script>
     // Redirect to login if no token found
@@ -17,90 +271,130 @@
 </head>
 <body>
 
-  <a href="/" class="home-icon" title="Home">
-    <i class="fas fa-home"></i>
-  </a>
+  <a href="/" class="home-icon" title="Home"><i class="fas fa-home"></i></a>
+  <button id="logoutBtn" onclick="logout()">Logout</button>
 
-  <h1>Welcome to the Movie API</h1>
+  <h1>Welcome to Movie API</h1>
 
   <div class="container">
-    <button onclick="generateKey()">Generate API Key</button>
-    <button id="copyBtn" onclick="copyKey()">Copy Key</button>
+    <div class="buttons-group">
+      <button onclick="generateKey()">Generate API Key</button>
+      <button id="copyBtn" onclick="copyKey()">Copy Key</button>
+    </div>
+
     <p id="result"></p>
 
-    <input type="text" id="search" placeholder="Search by title">
-    <select id="quality">
-      <option value="">All Qualities</option>
-      <option value="HD">HD</option>
-      <option value="SD">SD</option>
-      <option value="720p">720p</option>
-      <option value="1080p">1080p</option>
-    </select>
-    <button onclick="loadMovies()">Get Movies</button>
+    <div class="search-filters">
+      <input type="text" id="search" placeholder="Search movies by title..." />
+      <select id="quality" title="Select movie quality">
+        <option value="">All Qualities</option>
+        <option value="HD">HD</option>
+        <option value="SD">SD</option>
+        <option value="720p">720p</option>
+        <option value="1080p">1080p</option>
+      </select>
+      <button onclick="loadMovies()">Get Movies</button>
+    </div>
 
     <div class="movies" id="movies"></div>
   </div>
 
   <div class="watermark">
-    <a href="https://github.com/Sayurami" target="_blank">Powered by <strong>Sayura</strong></a>
+    <a href="https://github.com/Sayurami" target="_blank" rel="noopener noreferrer">Powered by <strong>Sayura</strong></a>
   </div>
 
   <script>
     let currentKey = '';
+
+    window.onload = () => {
+      const savedKey = localStorage.getItem('apiKey');
+      if (savedKey) {
+        currentKey = savedKey;
+        document.getElementById('result').textContent = "Your API Key: " + currentKey;
+        document.getElementById('copyBtn').style.display = 'inline-block';
+      }
+    };
 
     async function generateKey() {
       try {
         const response = await fetch('/generate-key', { method: 'POST' });
         const data = await response.json();
         currentKey = data.apiKey;
-        document.getElementById('result').innerText = "Your API Key: " + currentKey;
+        localStorage.setItem('apiKey', currentKey);
+        document.getElementById('result').textContent = "Your API Key: " + currentKey;
         document.getElementById('copyBtn').style.display = 'inline-block';
       } catch (error) {
-        document.getElementById('result').innerText = "Error generating key.";
+        document.getElementById('result').textContent = "Error generating API key.";
       }
     }
 
     function copyKey() {
       navigator.clipboard.writeText(currentKey).then(() => {
         alert("API Key copied to clipboard!");
+      }).catch(() => {
+        alert("Failed to copy API key.");
       });
     }
 
     async function loadMovies() {
-      const search = document.getElementById('search').value;
+      const search = document.getElementById('search').value.trim();
       const quality = document.getElementById('quality').value;
+
+      if (!currentKey) {
+        alert('Please generate your API key first.');
+        return;
+      }
 
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`/movies?search=${search}&quality=${quality}`, {
+        const url = `/movies?search=${encodeURIComponent(search)}&quality=${encodeURIComponent(quality)}`;
+        const response = await fetch(url, {
           headers: {
             'x-api-key': currentKey,
             'Authorization': `Bearer ${token}`
           }
         });
-        const movies = await response.json();
 
+        if (response.status === 401 || response.status === 403) {
+          alert('Session expired or unauthorized. Please login again.');
+          logout();
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch movies');
+        }
+
+        const movies = await response.json();
         const container = document.getElementById('movies');
         container.innerHTML = '';
 
         if (movies.length === 0) {
-          container.innerHTML = '<p>No movies found.</p>';
-        } else {
-          movies.forEach(movie => {
-            const div = document.createElement('div');
-            div.className = 'movie';
-            div.innerHTML = `
-              <img src="${movie.image}" alt="${movie.title}" />
-              <h4>${movie.title}</h4>
-              <small>${movie.quality}</small>
-            `;
-            container.appendChild(div);
-          });
+          container.innerHTML = '<p style="text-align:center; font-weight:600; color:#ff6b6b;">No movies found.</p>';
+          return;
         }
+
+        movies.forEach(movie => {
+          const div = document.createElement('div');
+          div.className = 'movie';
+          div.innerHTML = `
+            <img src="${movie.image}" alt="${movie.title}" loading="lazy" />
+            <h4>${movie.title}</h4>
+            <small>${movie.quality}</small>
+          `;
+          container.appendChild(div);
+        });
       } catch (err) {
         alert("Failed to fetch movies. Make sure your API key and login token are valid.");
         console.error(err);
       }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('apiKey');
+      currentKey = '';
+      window.location.href = '/login.html';
     }
   </script>
 
