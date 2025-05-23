@@ -138,11 +138,19 @@ app.get('/api/sinhalasub', checkApiKey, async (req, res) => {
   res.json(movies);
 });
 
+// NEW Sinhala Movies Route (Public or Secure as you like)
+app.get('/sinhala-movies', async (req, res) => {
+  const movies = await scrapeSinhalaMovies();
+  if (!movies.length) return res.status(500).json({ error: 'SinhalaSub scraping failed' });
+  res.json(movies);
+});
+
 // Default protected example
 app.get('/secure-data', checkApiKey, (req, res) => {
   res.send('You have accessed protected content!');
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
