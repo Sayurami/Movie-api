@@ -5,8 +5,7 @@
   <title>Movie API Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* Your CSS from above (same as you gave) */
-    /* Reset & base */
+    /* CSS ඔයා දුන්නා වගේම */
     * {
       margin: 0;
       padding: 0;
@@ -253,3 +252,68 @@
       </select>
       <button onclick="loadMovies()">Get Movies</button>
     </div>
+  </div>
+  <div class="movies" id="movies"></div>
+  <p class="watermark">Powered by <a href="https://example.com" target="_blank">Movie API</a></p>
+
+  <script>
+    // Example JS functions - ඔයාට ඔයාගේ logic එක යටතේ වෙනස් කරන්න පුළුවන්
+    
+    function logout() {
+      alert('Logging out...');
+      // ඔයාට මෙහි real logout logic එක දාන්න පුළුවන්
+    }
+
+    function generateKey() {
+      const key = 'API-' + Math.random().toString(36).substr(2, 16).toUpperCase();
+      document.getElementById('result').textContent = key;
+      document.getElementById('copyBtn').style.display = 'inline-block';
+    }
+
+    function copyKey() {
+      const key = document.getElementById('result').textContent;
+      if (!key) return alert('No key to copy!');
+      navigator.clipboard.writeText(key)
+        .then(() => alert('API Key copied to clipboard!'))
+        .catch(() => alert('Failed to copy!'));
+    }
+
+    function loadMovies() {
+      const search = document.getElementById('search').value.toLowerCase();
+      const quality = document.getElementById('quality').value;
+      const moviesContainer = document.getElementById('movies');
+      moviesContainer.innerHTML = '';
+
+      // Example movies data - replace with your API fetch
+      const movies = [
+        { title: 'Inception', quality: 'HD', year: 2010, img: 'https://via.placeholder.com/180x260?text=Inception' },
+        { title: 'Interstellar', quality: '1080p', year: 2014, img: 'https://via.placeholder.com/180x260?text=Interstellar' },
+        { title: 'The Dark Knight', quality: '720p', year: 2008, img: 'https://via.placeholder.com/180x260?text=Dark+Knight' },
+        { title: 'Avatar', quality: 'SD', year: 2009, img: 'https://via.placeholder.com/180x260?text=Avatar' },
+      ];
+
+      const filtered = movies.filter(m => {
+        const matchesTitle = m.title.toLowerCase().includes(search);
+        const matchesQuality = quality ? m.quality === quality : true;
+        return matchesTitle && matchesQuality;
+      });
+
+      if (filtered.length === 0) {
+        moviesContainer.innerHTML = '<p style="text-align:center; color:#00f0ff;">No movies found.</p>';
+        return;
+      }
+
+      filtered.forEach(movie => {
+        const div = document.createElement('div');
+        div.classList.add('movie');
+        div.innerHTML = `
+          <img src="${movie.img}" alt="${movie.title}" />
+          <h4>${movie.title}</h4>
+          <small>${movie.quality} - ${movie.year}</small>
+        `;
+        moviesContainer.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
