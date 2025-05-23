@@ -3,7 +3,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const crypto = require('crypto');
 const path = require('path');
-const nodemon = require('nodemon');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
