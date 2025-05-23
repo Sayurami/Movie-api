@@ -1,0 +1,120 @@
+<!DOCTYPE html><html lang="si">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>සිනයල උපසිරසි Database</title>
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: #ffffff;
+      font-family: sans-serif;
+      padding: 20px;
+    }h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #00e5ff;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1e1e1e;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #444;
+}
+
+th {
+  background-color: #222;
+  color: #00e5ff;
+}
+
+tr:hover {
+  background-color: #333;
+}
+
+a {
+  color: #00e5ff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+  <h1>සිනයල උපසිරසි Database</h1>  <input type="text" id="searchInput" placeholder="සොයන්න: Title අනුව සෙවිම..."/>  <table id="subtitleTable">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Quality</th>
+        <th>Language</th>
+        <th>Download</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="4">Loading subtitles...</td></tr>
+    </tbody>
+  </table>  <script>
+    let allData = [];
+
+    async function loadSubtitles() {
+      try {
+        const response = await fetch('https://raw.githubusercontent.com/Sayurami/Movie-api/main/sinhalasub_data.json');
+        const data = await response.json();
+        allData = data;
+        displayData(data);
+      } catch (err) {
+        console.error("Error fetching data", err);
+        document.querySelector("#subtitleTable tbody").innerHTML = "<tr><td colspan='4'>ඩන්ත ලබ ගෙනිමෙදි ඩෝෂජ්ක් සිදු විය</td></tr>";
+      }
+    }
+
+    function displayData(data) {
+      const tbody = document.querySelector("#subtitleTable tbody");
+      tbody.innerHTML = "";
+
+      if (data.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='4'>ගැලපෙන ඩන්ත බොමේ</td></tr>";
+        return;
+      }
+
+      data.forEach(sub => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${sub.title}</td>
+          <td>${sub.quality}</td>
+          <td>${sub.language}</td>
+          <td><a href="${sub.link}" target="_blank">Download</a></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", function() {
+      const query = this.value.toLowerCase();
+      const filtered = allData.filter(item =>
+        item.title.toLowerCase().includes(query)
+      );
+      displayData(filtered);
+    });
+
+    loadSubtitles();
+  </script></body>
+</html>
