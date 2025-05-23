@@ -1,40 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Movie API</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body { font-family: sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .login-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    input { display: block; margin: 10px 0; padding: 10px; width: 100%; }
-    button { padding: 10px; width: 100%; background: #007bff; color: white; border: none; cursor: pointer; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #fff;
+    }
+    .login-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px 40px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .login-container h2 {
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    .login-container input {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      font-size: 16px;
+    }
+    .login-container button {
+      width: 100%;
+      padding: 12px;
+      background: #00c6ff;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .login-container button:hover {
+      background: #0072ff;
+    }
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .back-link {
+      margin-top: 20px;
+      display: inline-block;
+      color: #ccc;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      color: #fff;
+    }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
+  <div class="login-container">
+    <h2><i class="fas fa-sign-in-alt"></i> Movie API Login</h2>
+    <input type="text" id="username" placeholder="Enter Username" />
+    <input type="password" id="password" placeholder="Enter Password" />
     <button onclick="login()">Login</button>
-    <p id="msg"></p>
+    <p class="message" id="msg"></p>
+    <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
   </div>
 
   <script>
     async function login() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const msg = document.getElementById("msg");
 
-      const res = await fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
+      if (!username || !password) {
+        msg.style.color = "yellow";
+        msg.innerText = "Please enter both username and password.";
+        return;
+      }
 
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem('token', data.token);
-        document.getElementById('msg').innerText = "Login successful!";
-      } else {
-        document.getElementById('msg').innerText = data.message || "Login failed.";
+      try {
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          msg.style.color = "lightgreen";
+          msg.innerText = "Login successful! Redirecting...";
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1000);
+        } else {
+          msg.style.color = "pink";
+          msg.innerText = data.message || "Login failed.";
+        }
+      } catch (err) {
+        msg.style.color = "red";
+        msg.innerText = "Error connecting to server.";
+        console.error(err);
       }
     }
   </script>
