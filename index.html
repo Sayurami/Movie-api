@@ -1,21 +1,25 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie API Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* Same CSS as before - clean and polished UI styling */
-    body {
+    /* Reset & base */
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: #f0f0f0;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 30px 15px 50px;
+      color: #f0f0f0;
     }
     a.home-icon {
       position: fixed;
@@ -23,27 +27,37 @@
       left: 20px;
       font-size: 28px;
       color: #00f0ff;
+      transition: color 0.3s ease;
       z-index: 10;
     }
-    a.home-icon:hover { color: #81f7ff; }
+    a.home-icon:hover {
+      color: #81f7ff;
+    }
     button#logoutBtn {
       position: fixed;
       top: 20px;
       right: 20px;
       background: #ff4b5c;
-      color: white;
       border: none;
       padding: 10px 18px;
       border-radius: 30px;
+      font-weight: 600;
+      color: white;
       cursor: pointer;
+      transition: background 0.3s ease;
       box-shadow: 0 4px 15px rgba(255, 75, 92, 0.6);
       z-index: 10;
     }
-    button#logoutBtn:hover { background: #e03e4d; }
+    button#logoutBtn:hover {
+      background: #e03e4d;
+      box-shadow: 0 6px 20px rgba(224, 62, 77, 0.8);
+    }
     h1 {
       font-size: 3rem;
       margin-bottom: 25px;
       text-shadow: 0 2px 8px rgba(0, 255, 255, 0.7);
+      letter-spacing: 2px;
+      font-weight: 700;
     }
     .container {
       background: rgba(255, 255, 255, 0.1);
@@ -55,45 +69,64 @@
       backdrop-filter: blur(12px);
       border: 1px solid rgba(0, 255, 255, 0.3);
     }
-    .buttons-group, .search-filters {
+    .buttons-group {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
       gap: 15px;
       margin-bottom: 20px;
-    }
-    input, select, button {
-      padding: 12px 18px;
-      border-radius: 30px;
-      border: none;
-      font-size: 16px;
-    }
-    input#search {
-      width: 240px;
-      background: rgba(255, 255, 255, 0.15);
-      color: #e0f7fa;
-    }
-    select#quality {
-      width: 160px;
-      background: rgba(255, 255, 255, 0.15);
-      color: #e0f7fa;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     button {
       background: #00f0ff;
-      color: #003841;
+      border: none;
+      padding: 14px 26px;
+      border-radius: 30px;
+      font-size: 16px;
       font-weight: 600;
+      color: #003841;
       cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 240, 255, 0.5);
+      transition: background 0.25s ease, box-shadow 0.25s ease;
+      min-width: 150px;
+    }
+    button:hover {
+      background: #00c8e0;
+      box-shadow: 0 7px 20px rgba(0, 200, 224, 0.7);
     }
     #copyBtn {
-      display: none;
       background: #16c79a;
       color: white;
+      min-width: 120px;
+      display: none;
+    }
+    #copyBtn:hover {
+      background: #129c7d;
     }
     #result {
       text-align: center;
       font-weight: 700;
+      margin: 0 0 20px;
       color: #00f0ff;
-      margin-bottom: 20px;
+      font-size: 1.1rem;
+      min-height: 24px;
+      text-shadow: 0 1px 3px rgba(0, 255, 255, 0.7);
+    }
+    .search-filters {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    input#search, select#quality {
+      padding: 12px 18px;
+      border-radius: 30px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #e0f7fa;
+      box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.3);
     }
     .movies {
       display: grid;
@@ -105,41 +138,56 @@
     .movie {
       background: rgba(0, 255, 255, 0.1);
       border-radius: 18px;
-      text-align: center;
+      overflow: hidden;
       box-shadow: 0 2px 8px rgba(0, 255, 255, 0.3);
+      text-align: center;
+      color: #e0f7fa;
     }
     .movie img {
       width: 100%;
       height: 260px;
       object-fit: cover;
-      border-bottom: 2px solid #00f0ff;
     }
     .movie h4 {
-      margin: 10px 0 5px;
+      padding: 12px 10px 6px;
+      font-size: 18px;
     }
     .movie small {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
       color: #a0e7ff;
+    }
+    .sinhala-sub {
+      display: inline-block;
+      background: #ffc107;
+      color: #000;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 15px;
+      font-size: 13px;
+      margin-bottom: 12px;
     }
     .watermark {
       margin-top: 30px;
       font-size: 15px;
       color: #00f0ff;
-      animation: pulse 3s infinite alternate;
-    }
-    .watermark a { color: #00e6ff; text-decoration: none; }
-    @keyframes pulse {
-      from { opacity: 0.7; } to { opacity: 1; }
     }
   </style>
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = "/login.html";
+  </script>
 </head>
 <body>
-  <a href="#" class="home-icon" title="Home"><i class="fas fa-home"></i></a>
+  <a href="/" class="home-icon" title="Home"><i class="fas fa-home"></i></a>
   <button id="logoutBtn" onclick="logout()">Logout</button>
   <h1>Welcome to Movie API</h1>
   <div class="container">
     <div class="buttons-group">
       <button onclick="generateKey()">Generate API Key</button>
       <button id="copyBtn" onclick="copyKey()">Copy Key</button>
+      <button onclick="loadSinhalaSubs()">සිංහල Sub Movies</button>
     </div>
     <p id="result"></p>
     <div class="search-filters">
@@ -153,52 +201,93 @@
       </select>
       <button onclick="loadMovies()">Get Movies</button>
     </div>
+    <div class="movies" id="movies"></div>
   </div>
-  <div class="movies" id="movies"></div>
-  <p class="watermark">Powered by <a href="#">Movie API</a></p>
+  <div class="watermark">
+    <a href="https://github.com/Sayurami" target="_blank">Powered by <strong>Sayura</strong></a>
+  </div>
   <script>
+    let currentKey = '';
+    window.onload = () => {
+      const savedKey = localStorage.getItem('apiKey');
+      if (savedKey) {
+        currentKey = savedKey;
+        document.getElementById('result').textContent = "Your API Key: " + currentKey;
+        document.getElementById('copyBtn').style.display = 'inline-block';
+      }
+    };
+
+    async function generateKey() {
+      try {
+        const response = await fetch('/generate-key', { method: 'POST' });
+        const data = await response.json();
+        currentKey = data.apiKey;
+        localStorage.setItem('apiKey', currentKey);
+        document.getElementById('result').textContent = "Your API Key: " + currentKey;
+        document.getElementById('copyBtn').style.display = 'inline-block';
+      } catch {
+        document.getElementById('result').textContent = "Error generating API key.";
+      }
+    }
+
+    function copyKey() {
+      navigator.clipboard.writeText(currentKey).then(() => alert("API Key copied to clipboard!"));
+    }
+
+    async function loadMovies() {
+      const search = document.getElementById('search').value.trim();
+      const quality = document.getElementById('quality').value;
+      if (!currentKey) return alert('Please generate your API key first.');
+      try {
+        const response = await fetch(`/movies?search=${encodeURIComponent(search)}&quality=${encodeURIComponent(quality)}`, {
+          headers: { 'x-api-key': currentKey, 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error();
+        const movies = await response.json();
+        renderMovies(movies);
+      } catch {
+        alert("Failed to fetch movies.");
+      }
+    }
+
+    async function loadSinhalaSubs() {
+      if (!currentKey) return alert('Please generate your API key first.');
+      try {
+        const response = await fetch('/movies?sinhalaSub=true', {
+          headers: { 'x-api-key': currentKey, 'Authorization': `Bearer ${token}` }
+        });
+        const movies = await response.json();
+        renderMovies(movies);
+      } catch {
+        alert("Failed to fetch Sinhala Sub movies.");
+      }
+    }
+
+    function renderMovies(movies) {
+      const container = document.getElementById('movies');
+      container.innerHTML = '';
+      if (!movies.length) {
+        container.innerHTML = '<p style="text-align:center; color:#ff6b6b;">No movies found.</p>';
+        return;
+      }
+      movies.forEach(movie => {
+        const div = document.createElement('div');
+        div.className = 'movie';
+        div.innerHTML = `
+          <img src="${movie.image}" alt="${movie.title}" loading="lazy" />
+          <h4>${movie.title}</h4>
+          <small>${movie.quality}</small>
+          ${movie.hasSinhalaSub ? '<span class="sinhala-sub">සිංහල Sub</span>' : ''}
+        `;
+        container.appendChild(div);
+      });
+    }
+
     function logout() {
-      alert('Logging out...');
-    }function generateKey() {
-  const key = 'API-' + Math.random().toString(36).substring(2, 16).toUpperCase();
-  document.getElementById('result').textContent = key;
-  document.getElementById('copyBtn').style.display = 'inline-block';
-}
-
-function copyKey() {
-  const key = document.getElementById('result').textContent;
-  if (!key) return alert('No key to copy!');
-  navigator.clipboard.writeText(key).then(() => alert('API Key copied!'));
-}
-
-function loadMovies() {
-  const search = document.getElementById('search').value.toLowerCase();
-  const quality = document.getElementById('quality').value;
-  const movies = [
-    { title: 'Inception', quality: 'HD', year: 2010, img: 'https://via.placeholder.com/180x260?text=Inception' },
-    { title: 'Interstellar', quality: '1080p', year: 2014, img: 'https://via.placeholder.com/180x260?text=Interstellar' },
-    { title: 'The Dark Knight', quality: '720p', year: 2008, img: 'https://via.placeholder.com/180x260?text=Dark+Knight' },
-    { title: 'Avatar', quality: 'SD', year: 2009, img: 'https://via.placeholder.com/180x260?text=Avatar' }
-  ];
-  const filtered = movies.filter(m => m.title.toLowerCase().includes(search) && (!quality || m.quality === quality));
-  const container = document.getElementById('movies');
-  container.innerHTML = '';
-  if (filtered.length === 0) {
-    container.innerHTML = '<p style="text-align:center; color:#00f0ff;">No movies found.</p>';
-    return;
-  }
-  filtered.forEach(movie => {
-    const div = document.createElement('div');
-    div.classList.add('movie');
-    div.innerHTML = `
-      <img src="${movie.img}" alt="${movie.title}" />
-      <h4>${movie.title}</h4>
-      <small>${movie.quality} - ${movie.year}</small>
-    `;
-    container.appendChild(div);
-  });
-}
-
+      localStorage.removeItem('token');
+      localStorage.removeItem('apiKey');
+      window.location.href = '/login.html';
+    }
   </script>
 </body>
 </html>
