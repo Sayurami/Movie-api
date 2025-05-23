@@ -1,70 +1,140 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Movie API Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* ... [existing CSS above] ... *//* Modal Styles */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.8);
-  justify-content: center;
-  align-items: center;
-}
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #e0f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .controls {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"], select {
+      padding: 8px 12px;
+      margin-right: 8px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      background-color: #00f0ff;
+      color: #121212;
+      font-weight: 700;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    button:hover {
+      background-color: #00c9d9;
+    }
+    #movies {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+    .movie {
+      background-color: #203a43;
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      text-align: center;
+      color: #e0f7fa;
+    }
+    .movie:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #00f0ff;
+    }
+    .movie img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .movie small {
+      color: #a0d9e0;
+    }
+    .sinhala-sub {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 6px;
+      background-color: #ff6b6b;
+      color: white;
+      font-size: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
 
-.modal-content {
-  background-color: #203a43;
-  margin: auto;
-  padding: 30px;
-  border-radius: 16px;
-  text-align: center;
-  color: #e0f7fa;
-  max-width: 500px;
-  position: relative;
-  animation: fadeIn 0.3s ease-in-out;
-}
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+    }
 
-.modal-content img {
-  width: 100%;
-  max-height: 300px;
-  object-fit: cover;
-  margin-bottom: 20px;
-  border-radius: 12px;
-}
+    .modal-content {
+      background-color: #203a43;
+      margin: auto;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      color: #e0f7fa;
+      max-width: 500px;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+    }
 
-.modal-content h2 {
-  margin: 0 0 10px;
-}
+    .modal-content img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      margin-bottom: 20px;
+      border-radius: 12px;
+    }
 
-.modal-content a {
-  display: inline-block;
-  margin-top: 12px;
-  color: #00f0ff;
-  font-weight: 600;
-  text-decoration: underline;
-}
+    .modal-content h2 {
+      margin: 0 0 10px;
+    }
 
-.close {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  font-size: 30px;
-  color: #fff;
-  cursor: pointer;
-}
+    .modal-content a {
+      display: inline-block;
+      margin-top: 12px;
+      color: #00f0ff;
+      font-weight: 600;
+      text-decoration: underline;
+    }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
-}
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 30px;
+      color: #fff;
+      cursor: pointer;
+    }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
   </style>
   <script>
     const token = localStorage.getItem('token');
@@ -73,7 +143,27 @@
     }
   </script>
 </head>
-<body>  <!-- [Existing UI elements] -->  <!-- Movie Preview Modal -->  <div id="movieModal" class="modal">
+<body>
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search movies..." />
+    <select id="quality">
+      <option value="">All Qualities</option>
+      <option value="720p">720p</option>
+      <option value="1080p">1080p</option>
+    </select>
+    <button onclick="loadMovies()">Search</button>
+    <button onclick="loadSinhalaSubs()">සිංහල Sub Movies</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div id="result" style="text-align:center; margin-bottom: 10px; font-weight:600;"></div>
+  <button id="copyBtn" style="display:none; margin-bottom: 20px;" onclick="copyKey()">Copy API Key</button>
+  <button onclick="generateKey()">Generate API Key</button>
+
+  <div id="movies"></div>
+
+  <!-- Movie Preview Modal -->
+  <div id="movieModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
       <img id="modalImage" src="" alt="Movie" />
@@ -81,7 +171,9 @@
       <p id="modalQuality"></p>
       <a id="modalLink" href="#" target="_blank">Watch or Download</a>
     </div>
-  </div>  <script>
+  </div>
+
+  <script>
     let currentKey = '';
 
     window.onload = () => {
@@ -181,11 +273,57 @@
       }
     }
 
+    async function loadSinhalaSubs() {
+      if (!currentKey) {
+        alert('Please generate your API key first.');
+        return;
+      }
+      try {
+        const token = localStorage.getItem('token');
+        const url = `/movies?sinhalaSub=true`;
+        const response = await fetch(url, {
+          headers: {
+            'x-api-key': currentKey,
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.status === 401 || response.status === 403) {
+          alert('Session expired or unauthorized. Please login again.');
+          logout();
+          return;
+        }
+        if (!response.ok) throw new Error('Failed to fetch Sinhala subtitle movies');
+        const movies = await response.json();
+        const container = document.getElementById('movies');
+        container.innerHTML = '';
+        if (movies.length === 0) {
+          container.innerHTML = '<p style="text-align:center; font-weight:600; color:#ff6b6b;">No Sinhala subtitle movies found.</p>';
+          return;
+        }
+        movies.forEach(movie => {
+          const div = document.createElement('div');
+          div.className = 'movie';
+          div.innerHTML = `
+            <img src="${movie.image}" alt="${movie.title}" loading="lazy" />
+            <h4>${movie.title}</h4>
+            <small>${movie.quality}</small>
+            <span class="sinhala-sub">සිංහල Sub</span>
+          `;
+          div.onclick = () => showModal(movie);
+          container.appendChild(div);
+        });
+      } catch (err) {
+        alert('Failed to load Sinhala subtitle movies.');
+        console.error(err);
+      }
+    }
+
     function logout() {
       localStorage.removeItem('token');
       localStorage.removeItem('apiKey');
       currentKey = '';
       window.location.href = '/login.html';
     }
-  </script></body>
+  </script>
+</body>
 </html>
