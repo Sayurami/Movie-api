@@ -126,6 +126,14 @@ const scrapeCinesubzMovies = async () => {
 };
 
 // Routes
+app.post('/request-verification', async (req, res) => {
+  // ... same as above
+});
+
+app.post('/verify', (req, res) => {
+  // ... same as above
+});
+
 app.get('/api/cinesubz', checkApiKey, async (req, res) => {
   const movies = await scrapeCinesubzMovies();
   if (!movies.length) return res.status(500).json({ error: 'Cinesubz scraping failed' });
@@ -138,7 +146,7 @@ app.get('/api/sinhalasub', checkApiKey, async (req, res) => {
   res.json(movies);
 });
 
-// NEW Sinhala Movies Route (Public or Secure as you like)
+// Public Sinhala movies route without API key (optional)
 app.get('/sinhala-movies', async (req, res) => {
   const movies = await scrapeSinhalaMovies();
   if (!movies.length) return res.status(500).json({ error: 'SinhalaSub scraping failed' });
