@@ -3,6 +3,9 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const crypto = require('crypto');
 const path = require('path');
+const fs = require('fs');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(express.json());
@@ -10,27 +13,65 @@ app.use(express.static('public'));
 
 const PORT = process.env.PORT || 8000;
 const BASE_URL = 'https://cinesubz.co/movies/';
+const SECRET = 'sayura_secret_key';
 
 const apiKeys = new Set();
+const usersFile = './users.json';
 
-// API Key Generate Function
+// Generate random API key
 function generateApiKey() {
   return crypto.randomBytes(16).toString('hex');
 }
 
-// Root page - Serve UI
+// Load user data
+function loadUsers() {
+  if (!fs.existsSync(usersFile)) return [];
+  return JSON.parse(fs.readFileSync(usersFile));
+}
+
+// Save user data
+function saveUsers(users) {
+  fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
+}
+
+// Serve the main page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Generate Key Endpoint
+// API key generation
 app.post('/generate-key', (req, res) => {
   const newKey = generateApiKey();
   apiKeys.add(newKey);
   res.json({ apiKey: newKey });
 });
 
-// Get Movies (Protected)
+// Signup route
+app.post('/signup', async (req, res) => {
+  const { username, password } = req.body;
+  const users = loadUsers();
+  if (users.find(u => u.username === username)) {
+    return res.status(400).json({ message: 'User already exists' });
+  }
+  const hash = await bcrypt.hash(password, 10);
+  users.push({ username, password: hash });
+  saveUsers(users);
+  res.json({ message: 'User registered successfully' });
+});
+
+// Login route
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const users = loadUsers();
+  const user = users.find(u => u.username === username);
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+  const token = jwt.sign({ username }, SECRET, { expiresIn: '1h' });
+  res.json({ token });
+});
+
+// Movie fetch route (requires valid API key)
 app.get('/movies', async (req, res) => {
   const key = req.headers['x-api-key'];
   if (!key || !apiKeys.has(key)) {
@@ -72,6 +113,7 @@ app.get('/movies', async (req, res) => {
   }
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log(`GOJO-MD Movie API running at http://localhost:${PORT}`);
 });
