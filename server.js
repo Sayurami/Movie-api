@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
