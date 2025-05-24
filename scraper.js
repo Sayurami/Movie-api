@@ -1,35 +1,28 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-async function getMovies() {
+async function scrapeSinhalaSub(query) {
+  const searchUrl = `https://www.sinhalasub.lk/?s=${encodeURIComponent(query)}`;
   try {
-    const url = 'https://cinesubz.co/movies/';
-    const { data } = await axios.get(url);
-    const $ = cheerio.load(data);
+    const response = await axios.get(searchUrl);
+    const $ = cheerio.load(response.data);
 
-    let movies = [];
+    const firstResult = $('.post-title a').first();
+    const title = firstResult.text().trim();
+    const link = firstResult.attr('href');
 
-    // Cinesubz website එකේ movies list එකේ HTML structure එකට අනුව selector එක වෙනස් විය හැකිය.
-    // මේක ඔයාට verify කරන්න ඕන.
-    $('.card').each((i, el) => {
-      const title = $(el).find('.card-title').text().trim();
-      const link = $(el).find('a').attr('href');
-      const image = $(el).find('img').attr('src');
+    if (!title || !link) {
+      return null;
+    }
 
-      if (title && link) {
-        movies.push({
-          title,
-          link: link.startsWith('http') ? link : `https://cinesubz.co${link}`,
-          image: image ? (image.startsWith('http') ? image : `https://cinesubz.co${image}`) : null
-        });
-      }
-    });
-
-    return movies;
+    return {
+      title,
+      link
+    };
   } catch (error) {
-    console.error('Error fetching movies:', error.message);
-    return [];
+    console.error("Scraping error:", error.message);
+    return null;
   }
 }
 
-module.exports = { getMovies };
+module.exports = scrapeSinhalaSub;
